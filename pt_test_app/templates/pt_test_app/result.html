@@ -1,0 +1,12 @@
+{% extends 'pt_test_app/main.html' %}
+
+{% block content %}
+<div class="card" style="width: 15rem; margin: 10px">
+    <div class="card-body">
+        <h5 class="card-title">Results:</a></h5>
+        <p class="card-text">
+            {{correct}} from {{total}} (<b>{{ percentage }}%</b>)
+        </p>
+    </div>
+</div>
+{% endblock %}

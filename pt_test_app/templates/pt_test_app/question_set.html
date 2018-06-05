@@ -1,0 +1,41 @@
+{% extends 'pt_test_app/main.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-3">
+            <div class="card">
+                <div class="card-body" id="left-column">
+                    <a href="{% url 'question-set-view' pk='' %}" >{% trans 'New set' %}</a>
+                    <div id="questions-list">
+                        <ul>
+                        {% for set in question_sets %}
+                            <li><a href="{% url 'question-set-view' pk=set.pk %}">{{ set }}</a></li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-9">
+            <div class="card">
+                <div class="card-body" id="center-column">
+                    <form action="{% url 'question-set-view' pk='' %}" method="POST">
+                    {{ form.questions }}
+                    {% csrf_token %}
+                    <br>
+                    <button>Submit</button>
+                    </form>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block templates %}{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+{% endblock %}

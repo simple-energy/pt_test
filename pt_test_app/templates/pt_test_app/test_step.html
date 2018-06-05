@@ -1,0 +1,27 @@
+{% extends 'pt_test_app/main.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<div class="card" style="width: 15rem; margin: 10px">
+    <div class="card-body">
+        <h5 class="card-title">{{text}}</a></h5>
+        <p class="card-text">
+            <form method="POST" action="{% url 'submit-answer-view' %}">
+                {% csrf_token %}
+                {% for f in form %}
+                    {{ f }} {{ f.label }}<br>
+                {% endfor %}
+                {{ form.non_field_errors }}
+                <button>Submit</button>
+            </form>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block templates %}{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+{% endblock %}

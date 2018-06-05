@@ -1,0 +1,124 @@
+{% extends 'pt_test_app/main.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-3">
+            <div class="card">
+                <div class="card-body" id="left-column">
+                    <button id="new-question" class="btn btn-success">{% trans 'New question' %}</button>
+                    <div id="questions-list"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-9">
+            <div class="card">
+                <div class="card-body" id="center-column">
+                    <div id="question-edit-area"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block templates %}
+<script type="text/template" id="question-short">
+    <div>
+        Question №: <%= model.get('id') %>
+    </div>
+</script>
+<script type="text/template" id="question-template">
+    <div>
+        <div class="text">
+            <div class="input-group">
+                <span class="input-group-addon fixed-width">{% trans 'Text' %}</span>
+                <textarea class="form-control" rows="2" placeholder="{% trans 'Text of the question' %}"><%= model.get('text') %></textarea>
+            </div>
+            <div class="errors">
+                <% if (model.validationError && 'text' in model.validationError) { %>
+                    <% print('<div class="alert alert-danger"><ul>') %>
+                    <% _.each(model.validationError.text, function (error) { %>
+                        <% print('<li>' + error + '</li>') %>
+                    <% }); %>
+                    <% print('</ul></div>'); %>
+                <% }; %>
+                <% if ('text' in serverErrors) { %>
+                    <% print('<div class="alert alert-danger"><ul>') %>
+                    <% _.each(serverErrors.text, function (error) { %>
+                        <% print('<li>' + error.message + '</li>') %>
+                    <% }); %>
+                    <% print('</ul></div>'); %>
+                <% }; %>
+            </div>
+        </div>
+
+        <div class="choices">
+            <% for (var i=0; i < model.get("choices").length; i++) { %>
+                <% var checkbox = ""; %>
+                <% if ( model.get("choices")[i].is_answer) { %>
+                    <% checkbox = "<input class='form-control' type='checkbox' style='position: relative;top: 50%;transform: translateY(-50%);' checked='checked'>" %>
+                <% } else { %>
+                    <% checkbox = "<input class='form-control' type='checkbox' style='position: relative;top: 50%;transform: translateY(-50%);'>" %>
+                <% } %>
+                <% var button_str = ""; %>
+                <% if (i >= 2) { %>
+                    <% button_str = "<button class='delete'>X</button>" %>
+                <% } %>                
+                <!--<% var choice_str = "<div class='row'><div class='col-lg-8'><input class='form-control' type='text' value='" + model.get("choices")[i].text + "'></div><div class='col-lg-2'>" + checkbox + "</div><div class='col-lg-2'>" + button_str + "</div></div>"; %>-->
+                <% var choice_str = "<div class='row'><div class='col-lg-8'><input class='form-control' type='text' value='" + model.get("choices")[i].text + "'></div><div class='col-lg-2'>" + checkbox + "</div><div class='col-lg-2'>" + button_str + "</div></div>"; %>
+                <% print(choice_str) %>
+            <% } %>
+            <div class="errors">
+                <% if (model.validationError && 'choices' in model.validationError) { %>
+                    <% print('<div class="alert alert-danger"><ul>') %>
+                    <% _.each(model.validationError.name, function (error) { %>
+                        <% print('<li>' + error + '</li>') %>
+                    <% }); %>
+                    <% print('</ul></div>'); %>
+                <% }; %>
+                <% if ('choices' in serverErrors) { %>
+                    <% print('<div class="alert alert-danger"><ul>') %>
+                    <% _.each(serverErrors.name, function (error) { %>
+                        <% print('<li>' + error.message + '</li>') %>
+                    <% }); %>
+                    <% print('</ul></div>'); %>
+                <% }; %>
+            </div>
+        </div>
+
+        <div class="row buttons-area">
+            <div class="col-lg-3">
+                <button id="add-answer" class="btn btn-cancel" >
+                    {% trans 'New answer' %}
+                </button>
+                <button class="btn btn-success" id="save-btn">{% trans "Save" %}</button>
+            </div>
+            <div class="col-lg-9"><!-- offset --></div>
+        </div>
+
+    </div>
+</script>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script>
+        window.URLs.QUESTION_URL = "{% url 'questions-json-view' pk='' %}";
+    </script>
+    <script src="{% static 'js/questions.js' %}"></script>
+    <script>
+        $(document).ready(function () {            
+            var collection = new QuestionCollection({{ questions | safe }});
+            viewQuestion = new QuestionView({
+                model: new QuestionModel(),
+                collection: collection
+            });
+            var view = new QuestionsView({collection: collection});
+            view.render();
+            $('#new-question').click(function () {
+                viewQuestion.createNewQuestion()
+            })
+        });
+    </script>
+{% endblock %}
